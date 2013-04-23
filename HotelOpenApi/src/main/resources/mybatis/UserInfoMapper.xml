@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.huoli.openapi.mapper.UserInfoMapper">
+	<resultMap id="BaseResultMap" type="com.huoli.openapi.vo.data.UserInfo">
+		<id column="uid" property="uid" jdbcType="INTEGER" />
+		<result column="reg_time" property="regTime" jdbcType="TIMESTAMP" />
+		<result column="platform" property="platform" jdbcType="VARCHAR" />
+		<result column="source" property="source" jdbcType="VARCHAR" />
+		<result column="imei" property="imei" jdbcType="VARCHAR" />
+		<result column="imsi" property="imsi" jdbcType="VARCHAR" />
+		<result column="ptype" property="ptype" jdbcType="VARCHAR" />
+		<result column="ctype" property="ctype" jdbcType="VARCHAR" />
+		<result column="token" property="token" />
+		<result column="login_id" property="loginUid" />
+		<result column="last_operate_time" property="lastOperateTime" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		uid, reg_time, platform, source, imei, imsi, ptype, ctype
+		,token,login_id,last_operate_time
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from user_info
+		where uid = #{uid,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByUserinfo" resultMap="BaseResultMap"
+		parameterType="com.huoli.openapi.vo.data.UserInfo">
+		select
+		<include refid="Base_Column_List" />
+		from user_info
+		<where>
+			<if test="uid != null">
+				uid = #{uid,jdbcType=INTEGER}
+			</if>
+			<if test="imei != null">
+				and imei=#{imei}
+			</if>
+			<if test="imsi != null">
+				and imsi=#{imsi}
+			</if>
+			<if test="ptype != null">
+				and ptype=#{ptype}
+			</if>
+			<if test="ctype != null">
+				and ctype=#{ctype}
+			</if>
+			<if test="loginUid != null">
+				and login_id=#{loginUid}
+			</if>
+		</where>
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from
+		user_info
+		where uid = #{uid,jdbcType=INTEGER}
+	</delete>
+	<insert id="insert" parameterType="com.huoli.openapi.vo.data.UserInfo"
+		useGeneratedKeys="true" keyProperty="uid">
+		insert into user_info (reg_time,
+		platform, source,
+		imei, imsi, ptype,
+		ctype,token,login_id,last_operate_time)
+		values
+		(#{regTime,jdbcType=TIMESTAMP},
+		#{platform,jdbcType=VARCHAR},
+		#{source,jdbcType=VARCHAR},
+		#{imei,jdbcType=VARCHAR},
+		#{imsi,jdbcType=VARCHAR},
+		#{ptype,jdbcType=VARCHAR},
+		#{ctype,jdbcType=VARCHAR}
+		#{ctype,jdbcType=VARCHAR},
+		#{token,jdbcType=VARCHAR},
+		#{loginUid,jdbcType=VARCHAR},
+		#{lastOperateTime,jdbcType=VARCHAR})
+	</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="com.huoli.openapi.vo.data.UserInfo">
+		update user_info
+		<set>
+			<if test="regTime != null">
+				reg_time = #{regTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="platform != null">
+				platform = #{platform,jdbcType=VARCHAR},
+			</if>
+			<if test="source != null">
+				source = #{source,jdbcType=VARCHAR},
+			</if>
+			<if test="imei != null">
+				imei = #{imei,jdbcType=VARCHAR},
+			</if>
+			<if test="imsi != null">
+				imsi = #{imsi,jdbcType=VARCHAR},
+			</if>
+			<if test="ptype != null">
+				ptype = #{ptype,jdbcType=VARCHAR},
+			</if>
+			<if test="ctype != null">
+				ctype = #{ctype,jdbcType=VARCHAR},
+			</if>
+			<if test="token != null">
+				token = #{token,jdbcType=VARCHAR},
+			</if>
+			<if test="loginUid != null">
+				login_id = #{loginUid,jdbcType=VARCHAR},
+			</if>
+			<if test="lastOperateTime != null">
+				last_operate_time = #{lastOperateTime,jdbcType=VARCHAR}
+			</if>
+		</set>
+		where uid = #{uid,jdbcType=INTEGER}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.huoli.openapi.vo.data.UserInfo">
+		update user_info
+		set reg_time = #{regTime,jdbcType=TIMESTAMP},
+		platform =
+		#{platform,jdbcType=VARCHAR},
+		source = #{source,jdbcType=VARCHAR},
+		imei
+		= #{imei,jdbcType=VARCHAR},
+		imsi = #{imsi,jdbcType=VARCHAR},
+		ptype =
+		#{ptype,jdbcType=VARCHAR},
+		ctype = #{ctype,jdbcType=VARCHAR},
+		token =
+		#{token,jdbcType=VARCHAR},
+		login_id = #{loginUid,jdbcType=VARCHAR},
+		last_operate_time = #{lastOperateTime,jdbcType=VARCHAR}
+		where uid =
+		#{uid,jdbcType=INTEGER}
+	</update>
+</mapper>

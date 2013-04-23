@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.huoli.openapi.mapper.UserWxInfoMapper">
+<resultMap id="BaseResultMap"
+		type="com.huoli.openapi.vo.data.UserWxInfo">
+		<id column="id" property="id" />
+		<result column="wxuser" property="wxuser" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+		<result column="busitype" property="busitype" jdbcType="VARCHAR" />
+		<result column="busidata" property="busidata" jdbcType="VARCHAR" />
+		<result column="status" property="status" />
+		<result column="userlevel" property="userlevel" />
+		<result column="reqcnt" property="reqcnt" />
+		<result column="regtime" property="regtime" />
+		<result column="lastusedtime" property="lastusedtime" />
+		
+	</resultMap>
+	<insert id="insert">
+		insert into user_wx_info (wxuser,phone,busitype,busidata,status,userlevel,reqcnt,regtime,lastusedtime)
+		values (#{wxuser},#{phone},#{busitype},#{busidata},#{status},#{userlevel},#{reqcnt},#{regtime},sysdate())
+	</insert>
+	
+	<select id="select" parameterType="String" resultMap="BaseResultMap">
+		select * from user_wx_info where wxuser=#{wxuser}
+	</select>
+	
+</mapper>

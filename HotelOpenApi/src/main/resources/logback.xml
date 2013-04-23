@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="logfile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${catalina.base}/logs/openapi.log.%d{yyyy-MM-dd}
+			</FileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n
+			</pattern>
+		</layout>
+	</appender>
+
+	<appender name="request"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${catalina.base}/logs/openapi-request.log.%d{yyyy-MM-dd}
+			</FileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyyMMddHHmmss}`%msg%n</pattern>
+		</layout>
+	</appender>
+
+	<appender name="orderEvent"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>${catalina.base}/logs/openapi-event.log.%d{yyyy-MM-dd}
+			</FileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<pattern>%d{yyyyMMddHHmmss}|%msg%n</pattern>
+		</layout>
+	</appender>
+
+	<logger name="com.huoli.openapi.log.HotelRequestLog" level="debug"
+		additivity="false">
+		<appender-ref ref="request" />
+	</logger>
+
+	<logger name="com.huoli.openapi.log.HotelRecordLog" level="info"
+		additivity="false">
+		<appender-ref ref="orderEvent" />
+	</logger>
+
+	<logger name="com.huoli" level="debug" additivity="false">
+		<appender-ref ref="logfile" />
+	</logger>
+
+	<root level="${logger.level}">
+		<appender-ref ref="logfile" />
+	</root>
+	</configuration>

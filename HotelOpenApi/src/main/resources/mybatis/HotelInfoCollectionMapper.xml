@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.huoli.openapi.mapper.HotelInfoCollectionMapper">
+	<resultMap id="BaseResultMap" type="com.huoli.openapi.vo.data.HotelInfoCollection">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="hotel_type" property="hotelType" jdbcType="VARCHAR" />
+		<result column="hotel_id" property="hotelId" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="tel" property="tel" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="lat" property="lat" jdbcType="DOUBLE" />
+		<result column="lnt" property="lnt" jdbcType="DOUBLE" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="logo" property="logo" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+		<result column="geohash" property="geohash" jdbcType="VARCHAR" />
+		<result column="introduce" property="introduce" jdbcType="LONGVARCHAR" />
+		<result column="extra_info" property="extraInfo" jdbcType="LONGVARCHAR" />
+		<result column="hotel_prefix" property="hotelPrefix" jdbcType="VARCHAR" />
+		<result column="hasdayroom" property="hasdayroom" jdbcType="VARCHAR" />
+		<result column="wifi" property="wifi" jdbcType="VARCHAR" />
+		<result column="parking" property="parking" jdbcType="VARCHAR" />
+		<result column="hasdayroom" property="hasdayroom" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<resultMap id="SimpleResultMap"
+		type="com.huoli.openapi.vo.data.HotelInfoCollectionSimple">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="hotel_type" property="hotelType" jdbcType="VARCHAR" />
+		<result column="hotel_id" property="hotelId" jdbcType="VARCHAR" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="address" property="address" jdbcType="VARCHAR" />
+		<result column="lat" property="lat" jdbcType="DOUBLE" />
+		<result column="lnt" property="lnt" jdbcType="DOUBLE" />
+		<result column="radius" property="radius" jdbcType="DOUBLE" />
+	</resultMap>
+
+	<resultMap type="com.huoli.openapi.vo.data.HotelBaseInfo" id="baseInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="hotel_type" property="hotelType" jdbcType="VARCHAR" />
+		<result column="hotel_id" property="hotelId" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectAllHotelBaseInfo" resultMap="baseInfo">
+		select
+		id,hotel_type,hotel_id from hotel_info_collection
+	</select>
+
+	
+	<select id="selectHotelsBaseInfo" resultMap="baseInfo">
+	select
+		id,hotel_type,hotel_id from hotel_info_collection where id in 
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+<select id="selectOfficialOrderHotels" parameterType="String" resultMap="BaseResultMap">
+<!-- select h.*,ifNull(s.wifi,2) wifi, ifNull(s.parking,2) parking, ifNull(s.subway,2) subway
+ from  hotel_info_collection h inner join hotel_info_mapping m on h.hotel_id=m.hotel_id 
+ and h.hotel_type=m.hotel_type and h.hotel_type=m.`outsrc` and h.status=1 and m.status=1 and m.hotel_type 
+ in(select hotel_type from  hotel_chain_info where order_enable=1 and ota_enable=0)  
+ left join hotel_service s on h.hotel_id=s.hotel_id and h.hotel_type=s.hotel_type
+  -->
+   select  h.*,ifNull(s.wifi,2) wifi, ifNull(s.parking,2) parking, ifNull(s.subway,2) subway from open_hotel_collection o,hotel_info_collection h,hotel_service s 
+ where o.hid=h.id and  o.status=1 and h.status=1 and  h.hotel_id=s.hotel_id and h.hotel_type=s.hotel_type and o.open_channel_id=#{channelId}
+</select>
+
+	<select id="selectChannelLogo" parameterType="String" resultType="String">
+		select chain_logo from hotel_chain_info where hotel_type=#{hotelType}
+	</select>
+
+	<select id="selectByHotelId" resultMap="BaseResultMap"
+		parameterType="com.huoli.openapi.vo.data.HotelInfoCollection">
+		select
+		tt1.*, tt2.wifi, tt2.parking, tt2.subway
+		from
+		hotel_info_collection tt1 LEFT JOIN hotel_service tt2 ON
+		tt1.hotel_type = tt2.hotel_type AND tt1.hotel_id = tt2.hotel_id
+		where
+		tt1.hotel_type = #{hotelType}
+		and tt1.hotel_id = #{hotelId}
+	</select>
+
+	<select id="selectById" resultMap="BaseResultMap" parameterType="Long">
+		select
+		tt1.*, tt2.wifi, tt2.parking, tt2.subway
+		from
+		hotel_info_collection tt1 LEFT JOIN hotel_service tt2 ON
+		tt1.hotel_type = tt2.hotel_type AND tt1.hotel_id = tt2.hotel_id
+		where
+		tt1.id=#{id}
+	</select>
+
+
+	<select id="selectByHotelType" resultMap="BaseResultMap">
+		select
+		tt1.*,tt2.wifi,tt2.parking, tt2.subway
+		from hotel_info_collection
+		tt1 LEFT JOIN hotel_service tt2 ON tt1.hotel_type = tt2.hotel_type AND
+		tt1.hotel_id = tt2.hotel_id
+		where
+		tt1.hotel_type
+		in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="queryNearByGps" resultMap="BaseResultMap"
+		parameterType="com.huoli.openapi.vo.data.GpsQuery">
+		<![CDATA[
+		SELECT tt1.*, tt2.wifi, tt2.parking, tt2.subway FROM 
+		(SELECT t1.*
+        FROM hotel_info_collection t1,
+       (SELECT *
+          FROM (SELECT a.id,
+                       geometry_distance(a.lat,
+                                         a.lnt,
+                                         ${lat},
+                                         ${lnt})
+                          AS radius
+                  FROM hotel_info_collection a
+                  ]]>
+		<where>
+           <![CDATA[ 
+            a.status = 1 
+            and 
+              a.lat <>0 
+            and 
+              a.lnt <>0 
+            ]]>
+			<if test="hotelType != null and hotelType != '' ">
+				and a.hotel_type = #{hotelType}
+			</if>
+			<if test="geohashExt != null">
+				and
+				<foreach collection="geohashExt" item="item" open="(" close=")"
+					separator=" or ">
+					a.geohash like '${item}%'
+				</foreach>
+			</if>
+		</where>
+                <![CDATA[    
+                ORDER BY radius
+                 LIMIT 8) b
+         WHERE b.radius < #{radius}) t2
+ WHERE t1.id = t2.id ) tt1 LEFT JOIN hotel_service tt2 ON tt1.hotel_type = tt2.hotel_type AND tt1.hotel_id = tt2.hotel_id
+		 ]]>
+	</select>
+
+	<select id="querySimpleNearByOfBigConfines" resultMap="SimpleResultMap"
+		parameterType="com.huoli.openapi.vo.data.GpsQuery">
+		<![CDATA[
+		SELECT tt1.*, tt2.wifi, tt2.parking, tt2.subway FROM 
+		(
+		SELECT t1.id,t1.hotel_type,t1.hotel_id,t1.name,t1.address,t1.lat,t1.lnt,t1.city,t1.logo,t1.hasdayroom,t2.radius
+        FROM hotel_info_collection t1,
+       (SELECT *
+          FROM (SELECT a.id,
+                       geometry_distance(a.lat,
+                                         a.lnt,
+                                         ${lat},
+                                         ${lnt})
+                          AS radius
+                  FROM hotel_info_collection a
+                  ]]>
+		<where>
+           <![CDATA[ 
+            a.status = 1 
+            and 
+              a.lat <>0 
+            and 
+              a.lnt <>0 
+            ]]>
+			<if test="hotelType != null and hotelType != '' ">
+				and a.hotel_type = #{hotelType}
+			</if>
+			<if test="geohashExt != null">
+				and
+				<foreach collection="geohashExt" item="item" open="(" close=")"
+					separator=" or ">
+					a.geohash like '${item}%'
+				</foreach>
+			</if>
+		</where>
+                <![CDATA[    
+                ORDER BY radius
+                 LIMIT #{limit}) b
+         WHERE b.radius < #{radius}) t2
+ WHERE t1.id = t2.id ) tt1 LEFT JOIN hotel_service tt2 ON tt1.hotel_type = tt2.hotel_type AND tt1.hotel_id = tt2.hotel_id
+		 ]]>
+	</select>
+
+	<select id="querySimpleNearByOfBigConfinesBaidu" resultMap="SimpleResultMap"
+		parameterType="com.huoli.openapi.vo.data.GpsQuery">
+		<![CDATA[
+		SELECT tt1.*, tt2.wifi, tt2.parking, tt2.subway FROM 
+		(
+		SELECT t1.id,t1.hotel_type,t1.hotel_id,t1.name,t1.address,t2.lat,t2.lnt,t1.city,t1.logo,t1.hasdayroom,t2.radius
+        FROM hotel_info_collection t1,
+       (SELECT *
+          FROM (SELECT a.id,g.lat,g.lnt,
+                       geometry_distance(g.lat,
+                                         g.lnt,
+                                         ${lat},
+                                         ${lnt})
+                          AS radius
+                 FROM hotel_info_collection a, hotel_info_gps g
+                  ]]>
+		<where>
+           <![CDATA[ 
+                       a.status = 1
+                       AND a.lat <> 0
+                       AND a.lnt <> 0
+                       AND g.gpstype = 1
+                       AND a.hotel_id = g.hotel_id
+                       AND a.hotel_type = g.hotel_type
+            ]]>
+			<if test="hotelType != null and hotelType != '' ">
+				and a.hotel_type = #{hotelType}
+			</if>
+			<if test="geohashExt != null">
+				and
+				<foreach collection="geohashExt" item="item" open="(" close=")"
+					separator=" or ">
+					g.geohash like '${item}%'
+				</foreach>
+			</if>
+		</where>
+                <![CDATA[    
+                ORDER BY radius
+                 LIMIT #{limit}) b
+         WHERE b.radius < #{radius}) t2
+ WHERE t1.id = t2.id ) tt1 LEFT JOIN hotel_service tt2 ON tt1.hotel_type = tt2.hotel_type AND tt1.hotel_id = tt2.hotel_id
+		 ]]>
+	</select>
+
+</mapper>

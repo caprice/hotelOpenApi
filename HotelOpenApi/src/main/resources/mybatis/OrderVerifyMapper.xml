@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.huoli.openapi.mapper.OrderVerifyMapper">
+<resultMap id="BaseResultMap"
+		type="com.huoli.openapi.vo.data.OrderVerify">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="hotel_type" property="hotelType" jdbcType="VARCHAR" />
+		<result column="hotel_id" property="hotelId" jdbcType="VARCHAR" />
+		<result column="linkman" property="linkman" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="idcard" property="idcard" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		
+		<result column="room_type" property="roomType" jdbcType="VARCHAR" />
+		<result column="room_desc" property="roomDesc" jdbcType="VARCHAR" />
+		<result column="price_info" property="priceInfo" jdbcType="VARCHAR" />
+		<result column="room_count" property="roomCount" jdbcType="INTEGER" />
+		<result column="verify" property="verify" jdbcType="VARCHAR" />
+		<result column="verify_status" property="verifyStatus" jdbcType="VARCHAR" />
+		<result column="user_status" property="userStatus" jdbcType="INTEGER" />
+		
+		<result column="extra_info" property="extraInfo" jdbcType="VARCHAR" />
+		<result column="kid" property="kid" jdbcType="VARCHAR" />
+		<result column="channel_id" property="channelId" jdbcType="VARCHAR" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="checkin_date" property="checkinDate" jdbcType="DATE" />
+		<result column="checkout_date" property="checkoutDate" jdbcType="DATE" />
+	</resultMap>
+	<select id="selectOrderVerifyByKid" parameterType="String" resultMap="BaseResultMap">
+		select * from  order_verify where kid = #{kid}
+	</select>
+	
+	
+	<insert id="insert" parameterType="com.huoli.openapi.vo.data.OrderVerify" >
+		insert into order_verify (
+		hotel_type,hotel_id,linkman,mobile,idcard,email,room_type,room_desc,price_info,room_count
+		,verify,verify_status,user_status,extra_info,kid,channel_id,status,create_time,update_time,checkin_date,checkout_date
+		) 
+		values (
+			#{hotelType},#{hotelId},#{linkman},#{mobile},#{idcard},#{email},#{roomType},#{roomDesc},#{priceInfo},
+			#{roomCount},#{verify},#{verifyStatus},#{userStatus},#{extraInfo},#{kid},#{channelId},#{status},#{createTime},
+			#{createTime},#{checkinDate},#{checkoutDate}
+		)
+	
+	</insert>
+	
+	
+	
+	<update id="updateStatus" parameterType="com.huoli.openapi.vo.data.OrderVerify">
+		update order_verify set status=#{status},update_time=sysdate() where kid=#{kid}
+	</update>
+	
+	<update id="updateVerify" parameterType="com.huoli.openapi.vo.data.OrderVerify">
+		update order_verify set verify=#{verify},update_time=sysdate() where kid=#{kid}
+	</update>
+</mapper>

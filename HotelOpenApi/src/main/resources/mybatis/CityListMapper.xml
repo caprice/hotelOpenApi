@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.huoli.openapi.mapper.CityListMapper">
+<resultMap id="BaseResultMap"
+		type="com.huoli.openapi.vo.result.City">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="cityname" property="name"/>
+		<result column="lat" property="lat" jdbcType="VARCHAR" />
+		<result column="lnt" property="lnt" jdbcType="VARCHAR" />
+		<result column="zhkey" property="zhkey" />
+	</resultMap>
+	
+	
+	
+	
+	
+	<select id="selectCityList"  resultMap="BaseResultMap">
+		select id,cityname,lat,lnt,zhkey from  city_list
+	</select>
+	
+	
+</mapper>
